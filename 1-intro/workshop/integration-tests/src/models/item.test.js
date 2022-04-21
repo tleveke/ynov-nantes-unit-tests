@@ -6,18 +6,24 @@ mongoose.connect('mongodb://mongo:27017/docker-node-mongo-test', { useNewUrlPars
   .then(() => console.log('MongoDB Connected'))
   .catch(err => console.log(err));
 
+beforeAll(async () => {
+    await Item.deleteMany();
+});
+afterEach(async () => {
+    await Item.deleteMany();
+});
 beforeEach(async () => {
     await Item.deleteMany();
 });
 
-it('should create an item', () => {
+test('should create an item', () => {
     const item = new Item({
         name: 'My Item'
     });
     expect(item.name).toBe('My Item');
 });
 
-it('should save an item', async () => {
+test('should save an item', async () => {
     const item = new Item({
         name: 'My Item'
     });
@@ -27,7 +33,7 @@ it('should save an item', async () => {
     expect(item.name).toBe(NewItem.name);
 });
 
-it('should find all items', async () => {
+test('should find all items', async () => {
     const item = new Item({
         name: 'My Item'
     });
@@ -37,7 +43,8 @@ it('should find all items', async () => {
     expect(items.length).toBe(1);
 });
 
-it('should delete an item', async () => {
+test('should delete an item', async () => {
+
     const item = new Item({
         name: 'My Item'
     });
@@ -48,7 +55,7 @@ it('should delete an item', async () => {
     expect(items.length).toBe(0);
 });
 
-it('should update an item', async () => {
+test('should update an item', async () => {
     const item = new Item({
         name: 'My Item'
     });
@@ -59,7 +66,7 @@ it('should update an item', async () => {
     expect(items[0].name).toBe('My Item Updated');
 });
 
-it('should find an item', async () => {
+test('should find an item', async () => {
     const item = new Item({
         name: 'My Item'
     });
@@ -68,3 +75,4 @@ it('should find an item', async () => {
     const items = await Item.find({ name: 'My Item' });
     expect(items[0].name).toBe('My Item');
 });
+
