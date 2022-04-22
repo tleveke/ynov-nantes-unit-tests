@@ -29,41 +29,35 @@ describe("Gilded Rose", function () {
   // Une fois que la date de péremption est passée, la qualité se dégrade deux fois plus rapidement.
   describe("Every item must have a sellIn value", () => {
 
-    it.each([10,-5,0])("should have a sellIn dynamic value", (sellIn) => {
-      let qualityOld = 20;
-      let qualityDiff = 0;
-
-      const gildedRose = shopMock([itemMock("Item", sellIn, qualityOld)]);
-
-      for (let i = 0; i < 100; i++) {
-        gildedRose.updateQuality();
-
-        qualityDiff = qualityOld - gildedRose.items[0].quality;
-
-        if (gildedRose.items[0].sellIn < 0 && gildedRose.items[0].quality !== 0) {
-          expect(qualityDiff).toBeGreaterThanOrEqual(2);
-        }
-
-        qualityOld = gildedRose.items[0].quality;
-      };
+    [10,-5,0].forEach(sellIn => {
+      it(`should have a sellIn ${sellIn} value`, () => {
+        let qualityOld = 20;
+        let qualityDiff = 0;
+  
+        const gildedRose = shopMock([itemMock("Item", sellIn, qualityOld)]);
+  
+        for (let i = 0; i < 100; i++) {
+          gildedRose.updateQuality();
+  
+          qualityDiff = qualityOld - gildedRose.items[0].quality;
+  
+          if (gildedRose.items[0].sellIn < 0 && gildedRose.items[0].quality !== 0) {
+            expect(qualityDiff).toBeGreaterThanOrEqual(2);
+          }
+  
+          qualityOld = gildedRose.items[0].quality;
+        };
+      });
     });
   });
   //La qualité (quality) d'un produit ne peut jamais être négative.
   describe("Quality cannot be negative", () => {
-    it("should have a quality value greater than 0", () => {
-      let shop = shopMock([itemMock("Item", 10, 10)]);
-      shop.updateQuality();
-      expect(shop.items[0].quality).toBeGreaterThanOrEqual(0);
-    });
-    it("should have a negative quality", () => {
-      let shop = shopMock([itemMock("Item", 10, -1)]);
-      shop.updateQuality();
-      expect(shop.items[0].quality).toBeGreaterThanOrEqual(0);
-    });
-    it("should have a zero value quality", () => {
-      let shop = shopMock([itemMock("Item", 10, 0)]);
-      shop.updateQuality();
-      expect(shop.items[0].quality).toBeGreaterThanOrEqual(0);
+    [10,-1,0].forEach(quality => {
+      it(`should have a quality ${quality} value`, () => {
+        let shop = shopMock([itemMock("Item", 10, quality)]);
+        shop.updateQuality();
+        expect(shop.items[0].quality).toBeGreaterThanOrEqual(0);
+      });
     });
   });
 
@@ -79,31 +73,30 @@ describe("Gilded Rose", function () {
         qualityOld = items[0].quality;
       };
     });
+    it("should quality increase by 1 when last day pass", () => {
+      const shop = shopMock([itemMock("Aged Brie", -1, 20)]);
+      shop.updateQuality();
+      expect(shop.items[0].quality).toBe(22);
+    });
   });
 
   // La qualité d'un produit n'est jamais de plus de 50.
   describe("Quality cannot be greater than 50", () => {
-    it("should have a quality value greater than 50", () => {
-      let shop = shopMock([itemMock("Item", 10, 100)]);
-      shop.updateQuality();
-      expect(shop.items[0].quality).toBeLessThanOrEqual(50);
+
+    [100,45,50].forEach(quality => {
+      it(`should have a quality ${quality} value`, () => {
+        let shop = shopMock([itemMock("Item", 10, quality)]);
+        shop.updateQuality();
+        expect(shop.items[0].quality).toBeLessThanOrEqual(50);
+      });
     });
-    it("quality of an item increases with time not greater than 50", function () {
+
+    it("quality of an item increases with time not greater than 50 with Aged Brie Item", function () {
       const gildedRose = shopMock([itemMock("Aged Brie", 100, 1)]);
       for (let i = 0; i < 100; i++) {
         const items = gildedRose.updateQuality();
         expect(items[0].quality).toBeLessThanOrEqual(50);
       };
-    });
-    it("should have a quality value less than 50", () => {
-      let shop = shopMock([itemMock("Item", 10, 45)]);
-      shop.updateQuality();
-      expect(shop.items[0].quality).toBeLessThanOrEqual(50);
-    });
-    it("should have a quality value equals than 50", () => {
-      let shop = shopMock([itemMock("Item", 10, 50)]);
-      shop.updateQuality();
-      expect(shop.items[0].quality).toBeLessThanOrEqual(50);
     });
   });
 
@@ -124,6 +117,7 @@ describe("Gilded Rose", function () {
   // quand il reste 10 jours ou moins et de 3 quand il reste 5 jours ou moins, mais la qualité tombe à 0 après le concert.
   describe("Backstage passes", () => {
 
+    
     it("when concert finished", () => {
       let qualityOld = 35;
       let qualityDiff = 0;
