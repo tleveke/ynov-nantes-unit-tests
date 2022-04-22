@@ -5,51 +5,35 @@ const shopMock = (...params) => new Shop(...params);
 
 describe("Gilded Rose", function () {
 
+  //Introduction of Gilded Rose
+  describe("Item classic", () => {
+    it("should have a name", () => {
+      const item = itemMock("+5 Dexterity Vest", 10, 20);
+      expect(item.name).toBe("+5 Dexterity Vest");
+    });
+    it("should have a sellIn", () => {
+      const item = itemMock("+5 Dexterity Vest", 10, 20);
+      expect(item.sellIn).toBe(10);
+    });
+    it("should have a quality", () => {
+      const item = itemMock("+5 Dexterity Vest", 10, 20);
+      expect(item.quality).toBe(20);
+    });
+    it("should quality decrease by 1 when one day pass", () => {
+      const shop = shopMock([itemMock("+5 Dexterity Vest", 10, 20)]);
+      shop.updateQuality();
+      expect(shop.items[0].quality).toBe(19);
+    });
+  });
+
   // Une fois que la date de péremption est passée, la qualité se dégrade deux fois plus rapidement.
   describe("Every item must have a sellIn value", () => {
-    it("should have a sellIn positive value", () => {
+
+    it.each([10,-5,0])("should have a sellIn dynamic value", (sellIn) => {
       let qualityOld = 20;
       let qualityDiff = 0;
 
-      const gildedRose = shopMock([itemMock("Item", 10, qualityOld)]);
-
-      for (let i = 0; i < 100; i++) {
-        gildedRose.updateQuality();
-
-        qualityDiff = qualityOld - gildedRose.items[0].quality;
-
-        if (gildedRose.items[0].sellIn < 0 && gildedRose.items[0].quality !== 0) {
-          expect(qualityDiff).toBeGreaterThanOrEqual(2);
-        }
-
-        qualityOld = gildedRose.items[0].quality;
-      };
-    });
-
-    it("should have a sellIn negative value", () => {
-      let qualityOld = 20;
-      let qualityDiff = 0;
-
-      const gildedRose = shopMock([itemMock("Item", -5, qualityOld)]);
-
-      for (let i = 0; i < 100; i++) {
-        gildedRose.updateQuality();
-
-        qualityDiff = qualityOld - gildedRose.items[0].quality;
-
-        if (gildedRose.items[0].sellIn < 0 && gildedRose.items[0].quality !== 0) {
-          expect(qualityDiff).toBeGreaterThanOrEqual(2);
-        }
-
-        qualityOld = gildedRose.items[0].quality;
-      };
-    });
-
-    it("should have a sellIn zero value", () => {
-      let qualityOld = 20;
-      let qualityDiff = 0;
-
-      const gildedRose = shopMock([itemMock("Item", 0, qualityOld)]);
+      const gildedRose = shopMock([itemMock("Item", sellIn, qualityOld)]);
 
       for (let i = 0; i < 100; i++) {
         gildedRose.updateQuality();
@@ -136,7 +120,7 @@ describe("Gilded Rose", function () {
       };
     });
   });
-// "Backstage passes", comme le "Aged Brie", augmente sa qualité (quality) plus le temps passe (sellIn) ; La qualité augmente de 2
+  // "Backstage passes", comme le "Aged Brie", augmente sa qualité (quality) plus le temps passe (sellIn) ; La qualité augmente de 2
   // quand il reste 10 jours ou moins et de 3 quand il reste 5 jours ou moins, mais la qualité tombe à 0 après le concert.
   describe("Backstage passes", () => {
 
@@ -183,7 +167,7 @@ describe("Gilded Rose", function () {
         qualityOld = gildedRose.items[0].quality;
       };
     });
-    it ("when there are 10 days or less", () => {
+    it("when there are 10 days or less", () => {
       let qualityOld = 10;
       let qualityDiff = 0;
 
@@ -228,7 +212,25 @@ describe("Gilded Rose", function () {
     });
   });
 
-  
+  // les éléments "Conjured" voient leur qualité se dégrader de deux fois plus vite que les objets normaux.
+  describe("Conjured", () => {
+    it("should decrease quality by 2", () => {
+      let qualityOld = 25;
+      let qualityDiff = 0;
+
+      const gildedRose = shopMock([itemMock("Conjured", 10, qualityOld)]);
+
+      for (let i = 0; i < 16; i++) {
+        gildedRose.updateQuality();
+        qualityDiff = gildedRose.items[0].quality - qualityOld;
+        if (gildedRose.items[0].quality !== 0) {
+          expect(qualityDiff).toBe(-2);
+        }
+        qualityOld = gildedRose.items[0].quality;
+      };
+    });
+  });
+
 
 });
 
@@ -238,7 +240,7 @@ describe("Gilded Rose", function () {
 // ✓ La qualité (quality) d'un produit ne peut jamais être négative. ✓
 // ✓ "Aged Brie" augmente sa qualité (quality) plus le temps passe. ✓
 // ✓ La qualité d'un produit n'est jamais de plus de 50. ✓
-// 🕷 "Sulfuras", étant un objet légendaire, n'a pas de date de péremption et ne perd jamais en qualité (quality) 🕷
+// ✓ "Sulfuras", étant un objet légendaire, n'a pas de date de péremption et ne perd jamais en qualité (quality) ✓
 // ✓ "Backstage passes", comme le "Aged Brie", augmente sa qualité (quality) plus le temps passe (sellIn) ; La qualité augmente de 2 ✓
 // ✓ quand il reste 10 jours ou moins et de 3 quand il reste 5 jours ou moins, mais la qualité tombe à 0 après le concert. ✓
-//  les éléments "Conjured" voient leur qualité se dégrader de deux fois plus vite que les objets normaux. 
+// ✓ les éléments "Conjured" voient leur qualité se dégrader de deux fois plus vite que les objets normaux. ✓
