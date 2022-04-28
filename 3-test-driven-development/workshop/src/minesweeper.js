@@ -9,10 +9,11 @@ class Board {
                 this.board[i].push(new Cell(i, j));
             }
         }
-        this.createBombs(bombs);
+        this.bombs = bombs;
+        this.createBombs();
     }
-    createBombs(bombs) {
-        bombs.forEach((bomb) => {
+    createBombs() {
+        this.bombs.forEach((bomb) => {
             this.board[bomb[0]][bomb[1]].isBomb = true;
         });
     }
@@ -29,6 +30,53 @@ class Board {
         });
         return board;
     }
+    getPoints() {
+        let board = [];
+        this.board.forEach((row,index) => {
+            board.push([]);
+            row.forEach((cell) => {
+                if (cell.isBomb) {
+                    board[index].push('*');
+                } else {
+                    board[index].push(0);
+                }
+            });
+        });
+
+        this.bombs.forEach((bomb) => {
+              
+            const bombRow = bomb[0];
+            const bombColumn = bomb[1];
+
+            let calCoords = [];
+            
+            if (bombRow - 1 >= 0) {
+                calCoords.push({row : bombRow - 1, column : bombColumn});    
+            }
+            if (bombRow + 1 < this.rows) {
+                calCoords.push({row : bombRow + 1, column : bombColumn});
+            }
+            if (bombColumn - 1 >= 0) {
+                calCoords.push({row : bombRow, column : bombColumn - 1});
+            }
+            if (bombColumn + 1 < this.columns) {
+                calCoords.push({row : bombRow, column : bombColumn + 1});
+            }
+
+            calCoords.forEach((coord) => {
+                if (board[coord.row][coord.column] !== '*') {
+                    if (board[coord.row][coord.column] === 0) {
+                        board[coord.row][coord.column] = 1;
+                    } else {
+                        board[coord.row][coord.column] += 1;
+                    }
+                }
+            });
+
+        });
+        
+        return board;
+    };
 }
 class Cell {
     constructor(row, column) {
