@@ -11,7 +11,14 @@ const createBoard = (rows, columns) => {
     }
     return board;
 };
+const createBombs = (board, bombs) => {
+    for (const bomb of bombs) {
+        board[bomb[0]][bomb[1]] = "*";
+    }
+    return board;
+};
 
 module.exports = {
     createBoard,
+    createBombs
 }; 
