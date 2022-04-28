@@ -1,9 +1,9 @@
-const { createBoard, createBombs } = require("../src/minesweeper");
+const { Board } = require("../src/minesweeper");
 
 const inputInitData = [
     {
         rows: 4,
-        columns: 3,
+        columns: 4,
         bombs: [
             [0, 0],
             [0, 1],
@@ -11,27 +11,26 @@ const inputInitData = [
         ]
     },
     {
-        rows: 3,
-        columns: 4,
-        bombs:[
-            [0,3],
-            [1,1]
+        rows: 5,
+        columns: 5,
+        bombs: [
+            [2, 1],
+            [3, 3],
         ]
-
     },
     {
         rows: 2,
         columns: 2,
-        bombs:[
-            [1,1],
-            [0,1]
+        bombs: [
+            [1, 1],
+            [0, 0]
         ]
     },
     {
-        rows: 1,
-        columns: 1,
-        bombs:[
-            [0,0]
+        rows: 2,
+        columns: 2,
+        bombs: [
+            [0, 0]
         ]
     },
 ];
@@ -40,10 +39,10 @@ describe("MineSweeper", function () {
 
     describe.each(inputInitData)("Create minesweeper board", (data) => {
         test(`MineSweeper Board should have ${data.rows} rows and ${data.columns} columns`, () => {
-            const board = createBoard(data.rows, data.columns);
+            const minesweeper = new Board(data.rows, data.columns, []);
             //The board should have length equal to the number of columns
-            expect(board.length).toBe(data.columns);
-            board.forEach((row) => {
+            expect(minesweeper.board.length).toBe(data.columns);
+            minesweeper.board.forEach((row) => {
                 //Each row should have length equal to the number of rows
                 expect(row.length).toBe(data.rows);
                 for (const cell of row) {
@@ -56,18 +55,18 @@ describe("MineSweeper", function () {
 
     describe.each(inputInitData)("Create minesweeper board with bombs", (data) => {
         test(`MineSweeper Board should have ${data.bombs.length} bombs`, () => {
-            const board = createBoard(data.rows, data.columns);
-            const boardBombs = createBombs(board, data.bombs);
+            const minesweeper = new Board(data.rows, data.columns, data.bombs);
             //The board should have bombs equal to the number of bombs
-            expect(boardBombs.reduce((acc, row) => {
+            console.log(minesweeper.getStringBoard());
+            expect(minesweeper.board.reduce((acc, row) => {
                 return acc + row.reduce((acc, cell) => {
-                    return cell === "*" ? acc + 1 : acc;
+                    return cell.get() === "*" ? acc + 1 : acc;
                 }, 0);
             }, 0)).toBe(data.bombs.length);
 
             data.bombs.forEach((bomb) => {
                 //In each bomb, the cell should be a bomb on the board with coordinates [bomb[0], bomb[1]]
-                expect(boardBombs[bomb[0]][bomb[1]]).toBe("*");
+                expect(minesweeper.board[bomb[0]][bomb[1]].get()).toBe("*");
             });
         });
     });
