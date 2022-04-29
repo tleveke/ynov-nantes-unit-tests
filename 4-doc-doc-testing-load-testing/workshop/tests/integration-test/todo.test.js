@@ -1,7 +1,7 @@
 //Unit Test for toDoModel.js for Todo Model
 const { it } = require('@jest/globals');
 
-const ToDo = require('../../toDoModel').ToDo;
+const ToDo = require('../../models/todo').ToDo;
 const mongoose = require('mongoose');
 
 

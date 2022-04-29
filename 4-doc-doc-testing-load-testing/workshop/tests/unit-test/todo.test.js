@@ -1,4 +1,4 @@
-const ToDo = require('../../toDoModel').ToDo;
+const ToDo = require('../../models/todo').ToDo;
 
 describe('ToDo Model', () => {
     it('should create', () => {
