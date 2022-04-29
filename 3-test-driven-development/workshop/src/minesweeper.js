@@ -34,7 +34,12 @@ class Board {
         });
     }
     getCell(row, column) {
-        return this.board[column][row];
+        if (this.board.length > 0) {
+            return this.board[row][column];
+        }
+        else {
+            return null;
+        }
     }
     click(row, column) {
         let cell = this.getCell(row, column);
@@ -73,8 +78,7 @@ class Board {
             });
         });
 
-        this.bombs.forEach((bomb) => {
-              
+        this.bombs.forEach((bomb,index) => {
             const bombRow = bomb[0];
             const bombColumn = bomb[1];
 
@@ -92,9 +96,21 @@ class Board {
             if (bombColumn + 1 < this.columns) {
                 calCoords.push({row : bombRow, column : bombColumn + 1});
             }
+            if (bombRow - 1 >= 0 && bombColumn - 1 >= 0) {
+                calCoords.push({row : bombRow - 1, column : bombColumn - 1});
+            }
+            if (bombRow - 1 >= 0 && bombColumn + 1 < this.columns) {
+                calCoords.push({row : bombRow - 1, column : bombColumn + 1});
+            }
+            if (bombRow + 1 < this.rows && bombColumn - 1 >= 0) {
+                calCoords.push({row : bombRow + 1, column : bombColumn - 1});
+            }
+            if (bombRow + 1 < this.rows && bombColumn + 1 < this.columns) {
+                calCoords.push({row : bombRow + 1, column : bombColumn + 1});
+            }
 
             calCoords.forEach((coord) => {
-                if (board[coord.row][coord.column] !== '*') {
+                if (board[coord.row] && board[coord.row][coord.column] !== '*') {
                     if (board[coord.row][coord.column] === 0) {
                         board[coord.row][coord.column] = 1;
                     } else {
