@@ -1,5 +1,20 @@
 class Board {
     constructor(rows, columns,bombs = []) {
+
+        if (rows < 0) {
+            throw new Error('Negative row is not possible')
+        }
+        if (columns < 0) {
+            throw new Error('Negative column is not possible')
+        }
+
+        if (rows === null) {
+            throw new Error('Null row is not possible')
+        }
+        if (columns === null) {
+            throw new Error('Null column is not possible')
+        }
+
         this.rows = rows;
         this.columns = columns;
         this.board = [];
@@ -11,6 +26,7 @@ class Board {
         }
         this.bombs = bombs;
         this.createBombs();
+        this.status = 'alive';
     }
     createBombs() {
         this.bombs.forEach((bomb) => {
@@ -19,6 +35,17 @@ class Board {
     }
     getCell(row, column) {
         return this.board[column][row];
+    }
+    click(row, column) {
+        let cell = this.getCell(row, column);
+        if (cell.isBomb) {
+            this.status = 'dead';
+        }
+        else {
+            //transform the cell into a number then transform the cells next to it if it's not a bomb
+            cell.isClicked = true;
+            
+        }
     }
     getStringBoard() {
         let board = '';
@@ -29,6 +56,9 @@ class Board {
             board += '\n';
         });
         return board;
+    }
+    getStatus() {
+        return this.status;
     }
     getPoints() {
         let board = [];
@@ -75,7 +105,7 @@ class Board {
 
         });
         
-        return board;
+        this.board = board;
     };
 }
 class Cell {
@@ -83,12 +113,16 @@ class Cell {
         this.row = row;
         this.column = column;
         this.isBomb = false;
+        this.isClicked = false;
     }
     get() {
-        if (this.isBomb) {
-            return '*';
+        if (this.getStatus()) {
+            return '.';
         }
         return '.';
+    }
+    getStatus() {
+        return this.isBomb;
     }
 }
 

@@ -9,9 +9,9 @@ const inputInitData = [
             [0, 1],
             [2, 2],
         ],
-        boardString: `**..
+        boardString: `....
 ....
-..*.
+....
 ....
 `,
         expectedBoardPoint: [
@@ -30,8 +30,8 @@ const inputInitData = [
         ],
         boardString : `.....
 .....
-.*...
-...*.
+.....
+.....
 .....
 `,
         expectedBoardPoint:[
@@ -49,8 +49,8 @@ const inputInitData = [
             [1, 1],
             [0, 0]
         ],
-        boardString: `*.
-.*
+        boardString: `..
+..
 `,
         expectedBoardPoint: [ [ '*', 2 ], [ 2, '*' ] ]
     },
@@ -60,7 +60,7 @@ const inputInitData = [
         bombs: [
             [0, 0]
         ],
-        boardString: `*.
+        boardString: `..
 ..
 `,
         expectedBoardPoint : [ [ '*', 1 ], [ 1, 0 ] ]
@@ -118,14 +118,14 @@ describe("MineSweeper", function () {
             //The board should have bombs equal to the number of bombs
             expect(minesweeper.board.reduce((acc, row) => {
                 return acc + row.reduce((acc, cell) => {
-                    return cell.get() === "*" ? acc + 1 : acc;
+                    return cell.getStatus() === true ? acc + 1 : acc;
                 }, 0);
             }, 0)).toBe(data.bombs.length);
             expect(minesweeper.bombs).toEqual(data.bombs);
             expect(minesweeper.getStringBoard()).toBe(data.boardString);
             data.bombs.forEach((bomb) => {
                 //In each bomb, the cell should be a bomb on the board with coordinates [bomb[0], bomb[1]]
-                expect(minesweeper.board[bomb[0]][bomb[1]].get()).toBe("*");
+                expect(minesweeper.board[bomb[0]][bomb[1]].getStatus()).toBe(true);
             });
         });
     });
@@ -134,19 +134,77 @@ describe("MineSweeper", function () {
     describe.each(inputInitData)("Create minesweeper board with bombs and cell numbers", (data) => {
         test(`MineSweeper Board should bomb on his coordinates`, () => {
             const minesweeper = new Board(data.rows, data.columns, data.bombs);
-            const minesweeperSpoiler = minesweeper.getPoints();
+            minesweeper.getPoints();
+
 
             data.bombs.forEach((bomb) => {
                 //In each bomb, the cell should be a bomb on the board with coordinates [bomb[0], bomb[1]]
-                expect(minesweeperSpoiler[bomb[0]][bomb[1]]).toBe("*");
+                expect(minesweeper.board[bomb[0]][bomb[1]]).toBe("*");
             });
         });
         // If a bomb is next to a normal cell then the cell has +1
         test(`MineSweeper Board cell should have numbers in it`, () => {
             const minesweeper = new Board(data.rows, data.columns, data.bombs);
-            const minesweeperSpoiler = minesweeper.getPoints();
-            expect(minesweeperSpoiler).toMatchObject(data.expectedBoardPoint);
+            minesweeper.getPoints();
+            expect(minesweeper.board).toMatchObject(data.expectedBoardPoint);
         });
-        
+    });
+
+    describe('Click on a cell', () => {
+        test('should return the cell clicked', () => {
+            const minesweeper = new Board(4, 4, []);
+            expect(minesweeper.getCell(0, 0)).toBe(minesweeper.board[0][0]);
+        }
+        );
+        test('click on cell bomb', () => {
+            const minesweeper = new Board(4, 4, [[0,0]]);
+            expect(minesweeper.getCell(0, 0).getStatus()).toBe(true);
+        });
+        test('click on cell not bomb to the side bomb', () => {
+            const minesweeper = new Board(4, 4, [[0,0]]);
+            minesweeper.getPoints();
+            expect(minesweeper.getCell(0, 1)).toBe(1);
+        });
+        test('click on cell not bomb not to the side bomb', () => {
+            const minesweeper = new Board(4, 4, [[0,0]]);
+            minesweeper.getPoints();
+            expect(minesweeper.getCell(1, 1)).toBe(0);
+        });
+
+        test('click on cell bomb and dead', () => {
+            const minesweeper = new Board(4, 4, [[0,0]]);
+            minesweeper.click(0, 0);
+            expect(minesweeper.getStatus()).toBe("dead");
+        });
+        test('click on cell not bomb and not dead', () => {
+            const minesweeper = new Board(4, 4, [[0,0]]);
+            minesweeper.click(0, 1);
+            expect(minesweeper.getStatus()).toBe("alive");
+        });
+        test('click on cell not bomb to the side bomb and reveal the points', () => {
+            const minesweeper = new Board(4, 4, [[0,0], [2,1]]);
+            minesweeper.click(0, 1);
+            expect(minesweeper.getCell(0, 1)).toBe(1);
+        });
+        test('click on cell not bomb not to the side bomb and reveal the points', () => {
+            const minesweeper = new Board(4, 4, [[0,0], [2,1]]);
+            minesweeper.click(3, 2);
+            expect(minesweeper.getCell(3, 3)).toBe(0);
+        });
+    });
+
+    describe('constructor Board incorrect', () => {
+        test('Board with row negative', () => {
+            expect(() => new Board(-1,1,[0,0])).toThrow('Negative row is not possible');
+        });
+        test('Board with column negative', () => {
+            expect(() => new Board(1,-1,[0,0])).toThrow('Negative column is not possible');
+        });
+        test('Board with row null', () => {
+            expect(() => new Board(null,1,[0,0])).toThrow('Null row is not possible');
+        });
+        test('Board with column null', () => {
+            expect(() => new Board(1,null,[0,0])).toThrow('Null column is not possible');
+        });
     });
 });
