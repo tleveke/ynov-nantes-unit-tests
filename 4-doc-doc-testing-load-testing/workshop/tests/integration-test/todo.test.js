@@ -4,10 +4,14 @@ const { it } = require('@jest/globals');
 const ToDo = require('../../toDoModel').ToDo;
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost:27017/docker-node-mongo-unit-test', { useNewUrlParser: true, useUnifiedTopology: true });
 
 
-beforeAll(async () => {
+beforeAll(async () => {    
+    //If you use npm run test in local (without docker) you need to connect to mongoose manually
+    //await mongoose.connect('mongodb://localhost:27017/docker-node-mongo-unit-test', { useNewUrlParser: true, useUnifiedTopology: true });
+
+    //If you use npm run test in docker
+    await mongoose.connect('mongodb://mongo:27017/docker-node-mongo-unit-test', { useNewUrlParser: true, useUnifiedTopology: true });
     await ToDo.deleteMany();
 });
 afterAll(done => {
